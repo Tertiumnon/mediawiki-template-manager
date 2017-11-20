@@ -1,0 +1,33 @@
+{
+  "name": "mediawiki-template-manager",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "del": "^3.0.0",
+    "gulp": "^3.9.1",
+    "gulp-batch": "^1.0.5",
+    "gulp-copy": "^1.0.1",
+    "gulp-filelog": "^0.4.1",
+    "gulp-tap": "^1.0.1",
+    "gulp-watch": "^4.3.11",
+    "mwbot": "^1.0.9"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "stream_dev": "gulp stream --dev",
+    "stream_test": "gulp stream --test",
+    "stream_prod": "gulp stream --prod",
+    "remove_dev": "node removeArticles --dev",
+    "remove_test": "node removeArticles --test",
+    "remove_prod": "node removeArticles --prod",
+    "update_dev": "node updateArticles --dev",
+    "update_test": "node updateArticles --test",
+    "update_prod": "node updateArticles --prod",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "git+ssh://git@bitbucket.org/Tertiumnon/mediawiki-template-manager.git",
+  "author": "Vitaliy Balabanov",
+  "license": "MIT",
+  "homepage": "https://bitbucket.org/Tertiumnon/mediawiki-template-manager#readme"
+}

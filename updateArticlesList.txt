@@ -1,0 +1,2 @@
+./pages/src/Test1
+./pages/src/Test2
