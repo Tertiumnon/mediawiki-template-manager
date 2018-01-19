@@ -19,14 +19,16 @@ function getFileNameFromPath(file_path) {
   let file_name = file_path_parts.pop();
   file_name = file_name
     .replace(" - ", ":")
+    .replace("_-_", ":")
     .replace(".html", "")
+    .replace(".htm", "")
     .replace(".mw", "")
     .replace(".md", "")
     .replace(".mediawiki", "");
   return file_name;
 }
 
-files_list_data = getFileContent('./updateArticlesList.txt');
+files_list_data = getFileContent(settings.articles_upd_list_file_path);
 files_list = files_list_data.split('\n');
 
 for (let i = 0; i < files_list.length; i++) {
@@ -55,25 +57,14 @@ switch (process.argv[2]) {
     server_api = settings.server_dev_api;
     break;
 }
-let bot = new MWBot({
-  apiUrl: server_api
-});
+let bot = new MWBot();
 
-bot.login({
+bot.loginGetEditToken({
+  apiUrl: server_api,
   username: settings.bot_user,
   password: settings.bot_password
-}).then((response) => {
-  bot.getEditToken().then((response) => {
-
-    bot.batch(batchJobs, 'update').then((response) => {
-      // Success 
-    }).catch((err) => {
-      // Error 
-    });
-
-  }).catch((err) => {
-    console.log(err);
-  });
+}).then(() => {
+   return bot.batch(batchJobs, 'update');
 }).catch((err) => {
   console.log(err);
 });

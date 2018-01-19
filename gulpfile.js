@@ -15,11 +15,13 @@ gulp.task('stream', function () {
     // console.log(file.path, file.basename);
     let filename = file.basename
       .replace(" - ", ":")
+      .replace("_-_", ":")
       .replace(".html", "")
+      .replace(".htm", "")
       .replace(".mw", "")
       .replace(".md", "")
       .replace(".mediawiki", "");
-    // console.log(filename);
+    console.log(filename);
 
     let server_api;
     switch (process.argv[3]) {

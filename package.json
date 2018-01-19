@@ -1,6 +1,6 @@
 {
   "name": "mediawiki-template-manager",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "dependencies": {
@@ -18,9 +18,9 @@
     "stream_dev": "gulp stream --dev",
     "stream_test": "gulp stream --test",
     "stream_prod": "gulp stream --prod",
-    "remove_dev": "node removeArticles --dev",
-    "remove_test": "node removeArticles --test",
-    "remove_prod": "node removeArticles --prod",
+    "delete_dev": "node deleteArticles --dev",
+    "delete_test": "node deleteArticles --test",
+    "delete_prod": "node deleteArticles --prod",
     "update_dev": "node updateArticles --dev",
     "update_test": "node updateArticles --test",
     "update_prod": "node updateArticles --prod",
