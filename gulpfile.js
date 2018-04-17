@@ -11,7 +11,7 @@ var settings = require('./settings'),
 gulp.task('stream', function () {
   // console.log(process.argv);
   // Endless stream mode 
-  return watch(['./pages/src/*/**/**', '!./pages/src/.git/'], { ignoreInitial: true, events: ['change'], verbose: true }, function (file) {
+  return watch([settings.articles_path + '*/**/**', '!' + settings.articles_path + '.git/'], { ignoreInitial: true, events: ['change'], verbose: true }, function (file) {
     // console.log(file.path, file.basename);
     let filename = file.basename
       .replace(" - ", ":")

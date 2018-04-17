@@ -21,6 +21,8 @@ switch (process.argv[2]) {
     break;
 }
 
+let summary = process.argv[3] ? process.argv[3] : 'Removing obsolete pages';
+
 fs.readFile(filePath, { encoding: 'utf-8' }, function (err, data) {
   if (!err) {
     let arr = [];
@@ -37,7 +39,7 @@ fs.readFile(filePath, { encoding: 'utf-8' }, function (err, data) {
       username: settings.bot_user,
       password: settings.bot_password
     }).then(() => {
-      return bot.batch(batchJobs, 'removing');
+      return bot.batch(batchJobs, summary);
     }).catch((err) => {
       console.log(err);
     });

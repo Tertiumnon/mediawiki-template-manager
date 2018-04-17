@@ -83,7 +83,7 @@ let days_from_date = new Date(today.getTime() + (days_from * 24 * 60 * 60 * 1000
 let days_from_date_iso = days_from_date.getFullYear() + '-' + (days_from_date.getMonth() + 1) + '-' + days_from_date.getDate();
 let days_to_date = new Date(today.getTime() + (days_to * 24 * 60 * 60 * 1000));
 let days_to_date_iso = days_to_date.getFullYear() + '-' + (days_to_date.getMonth() + 1) + '-' + days_to_date.getDate();
-console.log('search from', days_from_date_iso, ' 00:00', 'to', days_to_date_iso, ' 00:00');
+console.log('search from', days_from_date_iso, '00:00', 'to', days_to_date_iso, '00:00');
 
 for (let d = days_from; d < days_to; d++) {
 
@@ -100,8 +100,8 @@ for (let d = days_from; d < days_to; d++) {
   props_to_test = test_settings.queries[query_name].props.concat(test_settings.common_props);
   smw_query_props = serializeSemanticQueryProps(props_to_test);
   smw_query = test_settings.queries[query_name].query +
-  '[[Дата создания::>' + current_date.year + '-' + current_date.month + '-' + current_date.day + ']]' +
-  '[[Дата создания::<' + tomorrow.year + '-' + tomorrow.month + '-' + tomorrow.day + ']]' +
+  '[[Modification date::>' + current_date.year + '-' + current_date.month + '-' + current_date.day + ']]' +
+  '[[Modification date::<' + tomorrow.year + '-' + tomorrow.month + '-' + tomorrow.day + ']]' +
   smw_query_props +
   '|limit=1000';
   smw_queries.push(smw_query);
@@ -159,7 +159,7 @@ bot.loginGetEditToken({
       concurrency: 2
   }).then((response) => {
     if (pageCounter === pagesTotal) {
-      console.log('Done!', 'Broken articles:', broken_articles_arr.length);
+      console.log('Done!');
     }
   }).catch((err) => {
       // Error
