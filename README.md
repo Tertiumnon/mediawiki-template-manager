@@ -98,3 +98,11 @@ Articles for testing were created in the range between 30 days ago and today.
 ```
 $ node fixArticles --prod
 ```
+
+## Getting API results
+
+### Example
+
+```
+$ node getAPI --test --prod --[query_name]
+```

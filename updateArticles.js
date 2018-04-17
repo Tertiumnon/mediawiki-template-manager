@@ -34,7 +34,7 @@ files_list = files_list_data.split('\n');
 for (let i = 0; i < files_list.length; i++) {
   if (files_list[i]) {
     let x = getFileNameFromPath(files_list[i]);
-    let y = getFileContent(files_list[i]);
+    let y = getFileContent(settings.articles_path + files_list[i]);
     objects_for_update[x] = y;
   }
 }
