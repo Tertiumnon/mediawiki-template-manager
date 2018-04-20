@@ -73,20 +73,33 @@ $ npm run delete_dev
 
 ## Testing articles
 
-1. Create your config in "testArticles.settings.js".
-2. Run "node testArticles --[type of server] [articles were created n-days ago (from)] [articles were created n-days ago (to)]".
-3. If errors is logged, they will be saved at fixlist file (parameter "articles_fix_list_file_path" in "settings.js").
+Create your config (query list) in "testArticles.settings.js". Run:
+```
+node testArticles --[type of server] [query name] [date field name] [date from (ISO)] [date to (ISO)] [hours interval (int)]
+```
+* [type of server] - required,
+* [query name] - required,
+* [date field name] - possible values: 'Modification date', 'Creation date', any field in date-format,
+* [date from (ISO)], [date to (ISO)] - possible values: 2018-01-01, 2018-01-01T00:00:00.000Z.
+* [hours interval] - possible values: any integer.
 
-### Example
+If errors is logged, they will be saved at fixlist file (parameter "articles_fix_list_file_path" in "settings.js").
+
+### Example #1
 
 ```
-$ node testArticles --prod --testcase_1 -30 1
+$ node testArticles --prod --announces
 ```
 
-Articles for testing were created in the range between 30 days ago and today.
+Articles for testing will be checking in the range between 3 days ago and today.
 
-* "-30" - 30 days ago (from)
-* "1" - including all day today (to), because "0" is today "00:00"
+### Example #2
+
+```
+$ node testArticles --prod --announces 'Modification date' 2018-04-01 2018-04-05
+```
+
+Articles for testing will be checking in the range between 3 days ago and today.
 
 ## Fixing articles
 
