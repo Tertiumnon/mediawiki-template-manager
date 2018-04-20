@@ -27,13 +27,13 @@ function serializeSemanticQueryProps(arr) {
 
 function checkPropertiesErrors(printouts) {
   let props_founded = 0;
-  for (let j = 0; j < printouts.length; j++) {
-    if (props_to_test.indexOf(printouts[j].label) !== -1 && printouts[j][0]) {
-      // console.log(printouts[j].label);
+  for (let j = 0; j < printouts.length; j++) {   
+    if (props_to_test.indexOf(printouts[j].label) !== -1 && printouts[j][0] || printouts[j].label !== -1 && printouts[j][0] === 0) {
       props_founded++;
+    } else {
+      console.log(printouts[j].label);
     }
   }
-  // console.log(props_founded, props.length);
   return props_founded != props_to_test.length;
 }
 
@@ -45,6 +45,31 @@ function findBrokenArticles(arr) {
     if (errors) broken_articles_titles.push(arr[i].fulltext);
   }
   return broken_articles_titles;
+}
+
+function makeISOTimeDaysAgo(days_int) {
+  let days_from_date = new Date(new Date(today).getTime() - (days_int * 24 * 60 * 60 * 1000));
+  return days_from_date.toISOString();
+}
+
+function makeISOTimeToday() {
+  return new Date().toISOString();
+}
+
+function makeISOTimeNext(today_iso, hours_interval) {
+  let tomorrow_time = new Date(today_iso).getTime() + (hours_interval * 60 * 60 * 1000);
+  return new Date(tomorrow_time).toISOString();
+}
+
+function daysToCheck(date_start_iso, date_end_iso, hours_interval) {
+  let arr = [date_start_iso];
+  let from_time = new Date(date_start_iso).getTime();
+  let to_time = new Date(date_end_iso).getTime();
+  while (from_time < to_time) {
+    from_time = from_time + (hours_interval * 60 * 60 * 1000);
+    arr.push(new Date(from_time).toISOString());
+  }
+  return arr;
 }
 
 // arg 2
@@ -64,47 +89,32 @@ switch (process.argv[2]) {
     break;
 }
 
-// arg 4, 5
+// args 4, 5, 6
 
-let today = new Date(),
-  current_date,
-  tomorrow;
-today.year = today.getFullYear();
-today.month = today.getMonth() + 1;
-today.day = today.getDate();
+let today = makeISOTimeToday();
+console.log('today', today);
+let next_date;
 
-let days_from = -6,
-  days_to = 1;
-if (process.argv[4]) days_from = parseInt(process.argv[4]);
-if (process.argv[5]) days_to = parseInt(process.argv[5]);
+let date_type = process.argv[4] ? process.argv[4] : 'Modification_date';
+let days_from = process.argv[5] ? process.argv[5] : makeISOTimeDaysAgo(3);
+let days_to = process.argv[6] ? process.argv[6] : makeISOTimeToday();
+let hours_interval = process.argv[7] ? process.argv[7] : 24;
+console.log('search from', days_from, 'to', days_to);
+let days_to_check_arr = daysToCheck(days_from, days_to, hours_interval);
 
-console.log('today', today.year, today.month, today.day);
-let days_from_date = new Date(today.getTime() + (days_from * 24 * 60 * 60 * 1000));
-let days_from_date_iso = days_from_date.getFullYear() + '-' + (days_from_date.getMonth() + 1) + '-' + days_from_date.getDate();
-let days_to_date = new Date(today.getTime() + (days_to * 24 * 60 * 60 * 1000));
-let days_to_date_iso = days_to_date.getFullYear() + '-' + (days_to_date.getMonth() + 1) + '-' + days_to_date.getDate();
-console.log('search from', days_from_date_iso, '00:00', 'to', days_to_date_iso, '00:00');
+for (let day in days_to_check_arr) {
 
-for (let d = days_from; d < days_to; d++) {
-
-  current_date = new Date(today.getTime() + (d * 24 * 60 * 60 * 1000));
-  current_date.year = current_date.getFullYear();
-  current_date.month = current_date.getMonth() + 1;
-  current_date.day = current_date.getDate();
-  tomorrow = new Date(current_date.getTime() + (24 * 60 * 60 * 1000));
-  tomorrow.year = tomorrow.getFullYear();
-  tomorrow.month = tomorrow.getMonth() + 1;
-  tomorrow.day = tomorrow.getDate();
-
+  next_date = makeISOTimeNext(days_to_check_arr[day], hours_interval);
   query_name = serializeParam(process.argv[3]);
   props_to_test = test_settings.queries[query_name].props.concat(test_settings.common_props);
   smw_query_props = serializeSemanticQueryProps(props_to_test);
+  smw_dates = date_type !== false ? '[[' + date_type + '::>' + days_to_check_arr[day] + ']][[' + date_type + '::<' + next_date + ']]' : '';
   smw_query = test_settings.queries[query_name].query +
-  '[[Modification date::>' + current_date.year + '-' + current_date.month + '-' + current_date.day + ']]' +
-  '[[Modification date::<' + tomorrow.year + '-' + tomorrow.month + '-' + tomorrow.day + ']]' +
+  smw_dates +
   smw_query_props +
   '|limit=1000';
   smw_queries.push(smw_query);
+
 }
 
 let pagesTotal = smw_queries.length || 0;
@@ -121,26 +131,23 @@ bot.loginGetEditToken({
   return MWBot.map(smw_queries, (smw_query) => {
 
     pageCounter += 1;
-
     if (pageCounter%100 === 0) {
-      console.log(pageCounter);
+      console.log(' / ' + pageCounter + ' queries');
     }
 
     return bot.request({
         action: 'ask',
         query: smw_query
     }).then((response) => {
-
+      
+      process.stdout.write(response.query.meta.count + '.');
+      
       broken_articles_arr = findBrokenArticles(response.query['results']);
-
       if (broken_articles_arr && broken_articles_arr.length > 0) {
-
         console.log(broken_articles_arr);
-
         let stream = fs.createWriteStream(settings.articles_fix_list_file_path, {
           flags: 'a'
         });
-        
         stream.once('open', function(fd) {
           for (let i = 0; i < broken_articles_arr.length; i++) {
             const article = broken_articles_arr[i];
@@ -148,9 +155,8 @@ bot.loginGetEditToken({
           }
           stream.end();
         });
-
       }
-      
+
     }).catch((err) => {
         log(err);
     });
@@ -159,7 +165,7 @@ bot.loginGetEditToken({
       concurrency: 2
   }).then((response) => {
     if (pageCounter === pagesTotal) {
-      console.log('Done!');
+      console.log(' / Done!');
     }
   }).catch((err) => {
       // Error
