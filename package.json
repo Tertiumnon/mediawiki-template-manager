@@ -5,16 +5,20 @@
   "main": "index.js",
   "dependencies": {
     "del": "^3.0.0",
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.0",
     "gulp-batch": "^1.0.5",
-    "gulp-copy": "^1.0.1",
+    "gulp-copy": "^4.0.1",
     "gulp-filelog": "^0.4.1",
     "gulp-tap": "^1.0.1",
     "gulp-watch": "^4.3.11",
     "mwbot": "^1.0.9",
     "pretty-data": "^0.40.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint": "^5.9.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0"
+  },
   "scripts": {
     "stream_dev": "gulp stream --dev",
     "stream_test": "gulp stream --test",

@@ -1,70 +1,60 @@
-let settings = require('./settings'),
-  MWBot = require("mwbot"),
-  fs = require('fs'),
-  path = require('path');
 
-let server_api,
-  files_list_data,
-  files_list = [],
-  objects_for_update = {},
-  batchJobs = {};
 
-function getFileContent(file_path) {
-  let file_content = fs.readFileSync(file_path, 'utf-8');
-  return file_content;
+const MWBot = require('mwbot');
+const fs = require('fs');
+const settings = require('./settings');
+const Page = require('./classes/page');
+
+const ns = {
+  serverAPI: '',
+  fileListData: '',
+  fileList: [],
+  fileNamesPostfixes: ['.txt', '.htm', '.html', '.mw', '.wiki', '.mediawiki'],
+  categories: [],
+  pages: {},
+  batchPageJobs: {},
+};
+
+ns.fileListData = Page.getFileContent(settings.articles_upd_list_file_path);
+ns.fileList = ns.fileListData.split('\n');
+if (!ns.fileList.length) {
+  throw new Error('No file list');
 }
-
-function getFileNameFromPath(file_path) {
-  let file_path_parts = file_path.split('/');
-  let file_name = file_path_parts.pop();
-  file_name = file_name
-    .replace(" - ", ":")
-    .replace("_-_", ":")
-    .replace(".html", "")
-    .replace(".htm", "")
-    .replace(".mw", "")
-    .replace(".md", "")
-    .replace(".mediawiki", "");
-  return file_name;
-}
-
-files_list_data = getFileContent(settings.articles_upd_list_file_path);
-files_list = files_list_data.split('\n');
-
-for (let i = 0; i < files_list.length; i++) {
-  if (files_list[i]) {
-    let x = getFileNameFromPath(files_list[i]);
-    let y = getFileContent(settings.articles_path + files_list[i]);
-    objects_for_update[x] = y;
+ns.fileList.forEach((path) => {
+  if (path) {
+    const p = Page.getByPath(path);
+    if (p) ns.pages[p.title] = p.text;
   }
-}
+});
 
-batchJobs = {
-  edit: objects_for_update
+ns.batchPageJobs = {
+  edit: ns.pages,
 };
 
 switch (process.argv[2]) {
   case '--dev':
-    server_api = settings.server_dev_api;
+    ns.serverAPI = settings.server_dev_api;
     break;
   case '--test':
-    server_api = settings.server_test_api;
+    ns.serverAPI = settings.server_test_api;
     break;
   case '--prod':
-    server_api = settings.server_prod_api;
+    ns.serverAPI = settings.server_prod_api;
     break;
   default:
-    server_api = settings.server_dev_api;
+    ns.serverAPI = settings.server_dev_api;
     break;
 }
-let bot = new MWBot();
 
-bot.loginGetEditToken({
-  apiUrl: server_api,
-  username: settings.bot_user,
-  password: settings.bot_password
-}).then(() => {
-   return bot.batch(batchJobs, 'update');
-}).catch((err) => {
-  console.log(err);
-});
+const bot = new MWBot();
+
+bot
+  .loginGetEditToken({
+    apiUrl: ns.serverAPI,
+    username: settings.bot_user,
+    password: settings.bot_password,
+  })
+  .then(() => bot.batch(ns.batchPageJobs, 'update'))
+  .catch((err) => {
+    throw new Error(err);
+  });
