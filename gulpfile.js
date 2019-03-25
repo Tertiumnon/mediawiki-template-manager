@@ -1,68 +1,41 @@
-var settings = require('./settings'),
-  gulp = require('gulp'),
-  watch = require('gulp-watch'),
-  copy = require('gulp-copy'),
-  batch = require('gulp-batch'),
-  del = require('del'),
-  filelog = require('gulp-filelog'),
-  tap = require('gulp-tap'),
-  MWBot = require("mwbot");
+const gulp = require('gulp');
+const watch = require('gulp-watch');
+const filelog = require('gulp-filelog');
+const MWBot = require('mwbot');
+const Page = require('./models/page');
+const settings = require('./settings');
 
-gulp.task('stream', function () {
-  // console.log(process.argv);
-  // Endless stream mode 
-  return watch([settings.articles_path + '*/**/**', '!' + settings.articles_path + '.git/'], { ignoreInitial: true, events: ['change'], verbose: true }, function (file) {
-    // console.log(file.path, file.basename);
-    let filename = file.basename
-      .replace(" - ", ":")
-      .replace("_-_", ":")
-      .replace(".html", "")
-      .replace(".htm", "")
-      .replace(".mw", "")
-      .replace(".md", "")
-      .replace(".mediawiki", "");
-    console.log(filename);
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; // disable SSL alerts
 
-    let server_api;
-    switch (process.argv[3]) {
-      case '--dev':
-        server_api = settings.server_dev_api;
-        break;
-      case '--test':
-        server_api = settings.server_test_api;
-        break;
-      case '--prod':
-        server_api = settings.server_prod_api;
-        break;
-      default:
-        server_api = settings.server_dev_api;
-        break;
-    }
-    let bot = new MWBot({
-      apiUrl: server_api
-    });
+// Получаем аргументы
+const server = process.argv.length > 3 && process.argv[3] ? process.argv[3].slice(2) : 'default';
+const summary = process.argv.length > 4 && process.argv[4] ? process.argv[4] : 'Stream-обновление';
 
-    let title = filename;
-    let text = file.contents;
-    let summary = '';
+gulp.task('stream', () => watch([
+  `${settings[server].articles_path}*/**/**`,
+  `!${settings[server].articles_path}.git/`,
+], { ignoreInitial: true, events: ['change'], verbose: true }, (file) => {
+  // Получаем название страницы
+  const pageName = Page.getFileNameFromPath(file.basename);
+  console.log('>>> Open stream for page:', pageName);
 
-    bot.login({
-      username: settings.bot_user,
-      password: settings.bot_password
-    }).then((response) => {
-      bot.getEditToken().then((response) => {
-        bot.update(title, text, summary).then((response) => {
-          console.log(response.edit.title + ' | ' + response.edit.result);
-        }).catch((err) => {
-          console.log(err);
-        });
-      }).catch((err) => {
-        console.log(err);
-      });
-    }).catch((err) => {
+  // Создаём страницу
+  const p = new Page({ name: pageName, text: file.contents });
+
+  // Подключаемся и меняем страницу
+  const bot = new MWBot({
+    apiUrl: settings[server].server_api,
+  });
+  bot.login({
+    username: settings[server].bot_user,
+    password: settings[server].bot_password,
+  }).then(() => bot.getEditToken())
+    .then(() => bot.update(p.name, p.text, summary))
+    .then((response) => {
+      console.log(`>>> ${response.edit.title} | ${response.edit.result}`);
+    })
+    .catch((err) => {
       console.log(err);
     });
-  })
-    .pipe(filelog());
-});
-
+})
+  .pipe(filelog()));

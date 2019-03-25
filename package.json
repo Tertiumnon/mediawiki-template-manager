@@ -1,9 +1,10 @@
 {
-  "name": "mediawiki-template-manager",
-  "version": "0.1.0",
+  "name": "mw-deploy",
+  "version": "0.2.0",
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "debug": "^4.1.1",
     "del": "^3.0.0",
     "gulp": "^4.0.0",
     "gulp-batch": "^1.0.5",
@@ -12,27 +13,23 @@
     "gulp-tap": "^1.0.1",
     "gulp-watch": "^4.3.11",
     "mwbot": "^1.0.9",
-    "pretty-data": "^0.40.0"
+    "pretty-data": "^0.40.0",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
-    "eslint": "^5.9.0",
+    "eslint": "^5.14.1",
     "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.14.0"
+    "eslint-plugin-import": "^2.16.0"
   },
   "scripts": {
-    "stream_dev": "gulp stream --dev",
-    "stream_test": "gulp stream --test",
-    "stream_prod": "gulp stream --prod",
-    "delete_dev": "node deleteArticles --dev",
-    "delete_test": "node deleteArticles --test",
-    "delete_prod": "node deleteArticles --prod",
-    "update_dev": "node updateArticles --dev",
-    "update_test": "node updateArticles --test",
-    "update_prod": "node updateArticles --prod",
+    "start": "node index.js",
+    "stream": "gulp stream",
+    "update": "node components/page-update/page-update.js",
+    "delete": "node components/page-delete/page-delete.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": "git+ssh://git@bitbucket.org/Tertiumnon/mediawiki-template-manager.git",
+  "repository": "git+ssh://git@bitbucket.org/Tertiumnon/mw-deploy.git",
   "author": "Vitaliy Balabanov",
   "license": "MIT",
-  "homepage": "https://bitbucket.org/Tertiumnon/mediawiki-template-manager#readme"
+  "homepage": "https://github.com/Tertiumnon/mw-deploy"
 }
