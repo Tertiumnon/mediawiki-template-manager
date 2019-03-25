@@ -1,16 +1,20 @@
 module.exports = {
 
-  server_dev_api: "https://your-server-domain.dev/api.php",
-  server_test_api: "https://your-server-domain.test/api.php",
-  server_prod_api: "https://your-server-domain.prod/api.php",
+  default: {
+    server_api: 'http://DEFAULT_SERVER/api.php',
+    articles_path: '../PATH_TO_PAGES_DIR/',
+    articles_del_list_file_path: '../PATH_TO_PAGES_DIR/.articles_lists/articles_del_list.txt',
+    articles_upd_list_file_path: '../PATH_TO_PAGES_DIR/.articles_lists/articles_upd_list.txt',
+    bot_user: 'BOT_NAME',
+    bot_password: 'BOT_PASSWORD',
+  },
+  prod: {
+    server_api: 'https://PROD_SERVER/api.php',
+    articles_path: '../PATH_TO_PAGES_DIR/',
+    articles_del_list_file_path: '../PATH_TO_PAGES_DIR/.articles_lists/articles_del_list.txt',
+    articles_upd_list_file_path: '../PATH_TO_PAGES_DIR/.articles_lists/articles_upd_list.txt',
+    bot_user: 'BOT_NAME',
+    bot_password: 'BOT_PASSWORD',
+  },
 
-  bot_user: "bot_login",
-  bot_password: "bot_password",
-
-  articles_path: "../folder-with-articles/",
-
-  articles_fix_list_file_path: "../folder-with-articles/.articles_lists/articles_fix_list.txt",
-  articles_del_list_file_path: "../folder-with-articles/.articles_lists/articles_del_list.txt",
-  articles_upd_list_file_path: "../folder-with-articles/.articles_lists/articles_upd_list.txt"
-
-}
+};
