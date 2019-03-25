@@ -1,4 +1,4 @@
-# MW Tools
+# MW Deploy
 
 MW Deploy are tools for deploying MediaWiki-pages to remote servers.
 
