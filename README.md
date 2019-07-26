@@ -8,11 +8,6 @@ You can:
 * Update articles
 * Delete articles
 
-also:
-
-* Test semantic properties
-* Get API results from two servers
-
 ## Types of servers
 
 Your main server is "default" server. You can run:
