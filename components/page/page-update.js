@@ -1,5 +1,5 @@
-const MWBot = require('mwbot');
-const Page = require('../../models/page');
+const mwbot = require('mwbot');
+const Page = require('./page');
 const settings = require('../../settings');
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; // Disable SSL alerts
@@ -25,7 +25,7 @@ for (let i = 0; i < filesList.length; i++) {
 }
 
 // Обновляем страницы
-const bot = new MWBot({
+const bot = new mwbot({
   apiUrl: settings[server].server_api,
 });
 bot.loginGetEditToken({

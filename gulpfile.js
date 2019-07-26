@@ -1,8 +1,8 @@
 const gulp = require('gulp');
 const watch = require('gulp-watch');
 const filelog = require('gulp-filelog');
-const MWBot = require('mwbot');
-const Page = require('./models/page');
+const mwbot = require('mwbot');
+const Page = require('./components/page/page');
 const settings = require('./settings');
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; // disable SSL alerts
@@ -23,7 +23,7 @@ gulp.task('stream', () => watch([
   const p = new Page({ name: pageName, text: file.contents });
 
   // Подключаемся и меняем страницу
-  const bot = new MWBot({
+  const bot = new mwbot({
     apiUrl: settings[server].server_api,
   });
   bot.login({

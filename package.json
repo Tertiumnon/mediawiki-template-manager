@@ -1,6 +1,6 @@
 {
   "name": "mw-deploy",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "",
   "main": "index.js",
   "dependencies": {
@@ -24,8 +24,11 @@
   "scripts": {
     "start": "node index.js",
     "stream": "gulp stream",
-    "update": "node components/page-update/page-update.js",
-    "delete": "node components/page-delete/page-delete.js",
+    "update": "node components/page/page-update.js",
+    "delete": "node components/page/page-delete.js",
+    "read": "node components/page-storage/page-storage-read.js",
+    "download": "node components/page-storage/page-storage-download.js",
+    "upload": "node components/page-storage/page-storage-upload.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": "git+ssh://git@bitbucket.org/Tertiumnon/mw-deploy.git",
