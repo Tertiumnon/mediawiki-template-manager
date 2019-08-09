@@ -4,7 +4,9 @@ const fs = require('fs');
 module.exports = class Page {
   /**
    * Creates an instance of Page
-   * @param {*} props
+   * @param {Object} props
+   * @param {String} props.name
+   * @param {String} props.text
    */
   constructor(props) {
     this.name = props.name;
@@ -12,17 +14,17 @@ module.exports = class Page {
   }
 
   /**
-   * Get file name from path
+   * Get page name from path
    * @static
-   * @param {string} filePath Path to file
-   * @returns {string}
+   * @param {String} filePath Path to file
+   * @returns {String}
    */
-  static getFileNameFromPath(filePath) {
+  static getPagenameByFilepath(filePath) {
     const filePathParts = filePath.split('/');
     let res = filePathParts.pop();
     res = res
-      .replace(' - ', ':')
-      .replace('_-_', ':')
+      .replace('_--_', ':')
+      .replace(/_/g, ' ')
       .replace('.html', '')
       .replace('.htm', '')
       .replace('.md', '')
@@ -33,10 +35,23 @@ module.exports = class Page {
   }
 
   /**
+   * Get file name from page name
+   * @static
+   * @param {String} pagename
+   * @returns {String}
+   */
+  static getFilenameByPagename(pagename) {
+    const res = pagename
+      .replace(':', '_--_')
+      .replace(/ /g, '_');
+    return `${res}.html`;
+  }
+
+  /**
    * Get content from file by path
    * @static
-   * @param {string} filePath Path to file
-   * @returns {string}
+   * @param {String} filePath Path to file
+   * @returns {String}
    */
   static getFileContent(filePath) {
     const res = fs.readFileSync(filePath, 'utf-8');

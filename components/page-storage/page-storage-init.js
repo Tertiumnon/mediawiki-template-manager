@@ -7,7 +7,6 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; // Disable SSL alerts
 
 // Получаем аргументы
 const server = process.argv.length > 2 && process.argv[2] ? process.argv[2].slice(2) : 'default';
-const pagename = process.argv.length > 3 && process.argv[3] ? process.argv[3] : 'Заглавная страница';
 const dataPath = path.join(__dirname, `../../${settings[server].articles_path}`);
 
 const pageStorage = new PageStorage({
@@ -19,4 +18,4 @@ const pageStorage = new PageStorage({
   },
 });
 pageStorage.init();
-pageStorage.download([pagename]);
+pageStorage.download(pageStorage.getPageList());

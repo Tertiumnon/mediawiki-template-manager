@@ -1,4 +1,4 @@
-const mwbot = require('mwbot');
+const MWBot = require('mwbot');
 const Page = require('./page');
 const settings = require('../../settings');
 
@@ -18,14 +18,14 @@ const batchJobs = {
 };
 for (let i = 0; i < filesList.length; i++) {
   if (filesList[i]) {
-    const x = Page.getFileNameFromPath(filesList[i]);
-    const y = Page.getFileContent(settings[server].articles_path + filesList[i]);
+    const x = Page.getPagenameByFilepath(filesList[i]);
+    const y = Page.getFileContent(`${settings[server].articles_path}/${filesList[i]}`);
     batchJobs.edit[x] = y;
   }
 }
 
 // Обновляем страницы
-const bot = new mwbot({
+const bot = new MWBot({
   apiUrl: settings[server].server_api,
 });
 bot.loginGetEditToken({

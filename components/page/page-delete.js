@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const mwbot = require('mwbot');
+const MWBot = require('mwbot');
 const settings = require('../../settings');
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; // Disable SSL alerts
@@ -20,7 +20,7 @@ fs.readFile(path.join(__dirname, settings[server].articles_del_list_file_path), 
 
     batchJobs.delete = arr;
 
-    const bot = new mwbot();
+    const bot = new MWBot();
 
     bot.loginGetEditToken({
       apiUrl: settings[server].server_api,

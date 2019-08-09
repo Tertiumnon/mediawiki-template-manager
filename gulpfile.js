@@ -1,7 +1,7 @@
 const gulp = require('gulp');
 const watch = require('gulp-watch');
 const filelog = require('gulp-filelog');
-const mwbot = require('mwbot');
+const MWBot = require('mwbot');
 const Page = require('./components/page/page');
 const settings = require('./settings');
 
@@ -12,18 +12,18 @@ const server = process.argv.length > 3 && process.argv[3] ? process.argv[3].slic
 const summary = process.argv.length > 4 && process.argv[4] ? process.argv[4] : 'Stream-обновление';
 
 gulp.task('stream', () => watch([
-  `${settings[server].articles_path}*/**/**`,
-  `!${settings[server].articles_path}.git/`,
+  `${settings[server].articles_path}/*/**/**`,
+  `!${settings[server].articles_path}/.git/`,
 ], { ignoreInitial: true, events: ['change'], verbose: true }, (file) => {
   // Получаем название страницы
-  const pageName = Page.getFileNameFromPath(file.basename);
+  const pageName = Page.getPagenameByFilepath(file.basename);
   console.log('>>> Open stream for page:', pageName);
 
   // Создаём страницу
   const p = new Page({ name: pageName, text: file.contents });
 
   // Подключаемся и меняем страницу
-  const bot = new mwbot({
+  const bot = new MWBot({
     apiUrl: settings[server].server_api,
   });
   bot.login({
