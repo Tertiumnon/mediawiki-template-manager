@@ -12,7 +12,7 @@ const server = process.argv.length > 3 && process.argv[3] ? process.argv[3].slic
 const summary = process.argv.length > 4 && process.argv[4] ? process.argv[4] : 'Stream-обновление';
 
 gulp.task('stream', () => watch([
-  `${settings[server].articles_path}/*/**/**`,
+  `${settings[server].articles_path}/**/**/**`,
   `!${settings[server].articles_path}/.git/`,
 ], { ignoreInitial: true, events: ['change'], verbose: true }, (file) => {
   // Получаем название страницы
