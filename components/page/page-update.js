@@ -1,5 +1,5 @@
 const MWBot = require('mwbot');
-const Page = require('../../models/page');
+const Page = require('./page');
 const settings = require('../../settings');
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; // Disable SSL alerts
@@ -18,8 +18,8 @@ const batchJobs = {
 };
 for (let i = 0; i < filesList.length; i++) {
   if (filesList[i]) {
-    const x = Page.getFileNameFromPath(filesList[i]);
-    const y = Page.getFileContent(settings[server].articles_path + filesList[i]);
+    const x = Page.getPagenameByFilepath(filesList[i]);
+    const y = Page.getFileContent(`${settings[server].articles_path}/${filesList[i]}`);
     batchJobs.edit[x] = y;
   }
 }
