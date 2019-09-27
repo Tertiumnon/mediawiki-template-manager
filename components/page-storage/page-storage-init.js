@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const path = require('path');
 
 const PageStorage = require('../page-storage/page-storage');
@@ -22,7 +23,7 @@ const pageStorage = new PageStorage({
 // Do some magic
 const ps = pageStorage.init();
 ps.then(() => {
-  pageStorage.download(pageStorage.getPageList());
+  console.log('inited');
 }).catch((err) => {
   console.log(err);
 });

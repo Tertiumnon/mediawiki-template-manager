@@ -30,40 +30,88 @@ module.exports = class PageStorage {
   }
 
   /**
-   * Initialize data
+   * Get all data
+   * @returns {Promise}
    */
   init() {
+    console.log('init data');
     const { dataPath } = this;
-    return this.getAllTemplates()
+    this.initLocalData(dataPath);
+    return this.getAllMediawikis()
+      .then(() => this.getAllTemplates())
+      .then(() => this.getAllHelps())
       .then(() => this.getAllCategories())
-      .then(() => this.getAllMediawikis())
       .then(() => this.getAllProperties())
-      .then(() => {
-        this.initLocalData(dataPath);
-        this.removeNotExistLocalPages();
-        return true;
-      })
+      .then(() => this.getAllForms())
+      .then(() => this.getAllConcepts())
       .catch((err) => {
         console.log(err);
       });
   }
 
-  getAllCategories() {
-    return this.getAllPages({ ns: 14 });
-  }
 
-  getAllTemplates() {
-    return this.getAllPages({ ns: 10 });
-  }
-
-  getAllProperties() {
-    return this.getAllPages({ ns: 102 });
-  }
-
+  /**
+   * Get all pages from namespace MediaWiki
+   * @returns {Promise}
+   */
   getAllMediawikis() {
     return this.getAllPages({ ns: 8 });
   }
 
+  /**
+   * Get all pages from namespace Template
+   * @returns {Promise}
+   */
+  getAllTemplates() {
+    return this.getAllPages({ ns: 10 });
+  }
+
+  /**
+   * Get all pages from namespace Help
+   * @returns {Promise}
+   */
+  getAllHelps() {
+    return this.getAllPages({ ns: 12 });
+  }
+
+  /**
+   * Get all pages from namespace Category
+   * @returns {Promise}
+   */
+  getAllCategories() {
+    return this.getAllPages({ ns: 14 });
+  }
+
+  /**
+   * Get all pages from namespace Property
+   * @returns {Promise}
+   */
+  getAllProperties() {
+    return this.getAllPages({ ns: 102 });
+  }
+
+  /**
+   * Get all pages from namespace Form
+   * @returns {Promise}
+   */
+  getAllForms() {
+    return this.getAllPages({ ns: 106 });
+  }
+
+  /**
+   * Get all pages from namespace Concept
+   * @returns {Promise}
+   */
+  getAllConcepts() {
+    return this.getAllPages({ ns: 108 });
+  }
+
+  /**
+   * Get pages
+   * @param {Object} params
+   * @param {String} params.ns Неймспейс
+   * @returns {Promise}
+   */
   getAllPages(params) {
     return this.bot.loginGetEditToken({
       apiUrl: this.apiURL,
@@ -80,8 +128,10 @@ module.exports = class PageStorage {
         if (response.continue) {
           console.warn('There are too much pages!', params);
         }
-        if (response.query && response.query.allpages) {
-          this.data = [...this.data, ...response.query.allpages.filter(r => (r.title !== '' && r.title.search('/') === -1))];
+        if (response.query && response.query.allpages && response.query.allpages.length > 0) {
+          const data = response.query.allpages.filter(r => (r.title !== '' && r.title.search('/') === -1));
+          this.download(data.map(p => p.title));
+          this.data = [...this.data, ...data];
           return true;
         }
         return false;
@@ -91,6 +141,7 @@ module.exports = class PageStorage {
   }
 
   removeNotExistLocalPages() {
+    console.log('remove not existing local pages');
     const pagenames = [this.localData.map(o => o.title), this.data.map(o => o.title)];
     const diffPagenames = pagenames.reduce((a, b) => a.filter(c => !b.includes(c)));
     if (diffPagenames.length > 0) {
@@ -114,6 +165,7 @@ module.exports = class PageStorage {
    * @param {String[]} pagenames
    */
   download(pagenames) {
+    console.log('download data');
     this.bot.loginGetEditToken({
       apiUrl: this.apiURL,
       username: this.botData.user,
@@ -137,8 +189,8 @@ module.exports = class PageStorage {
   /**
    * Write content to file
    * @param {Object} params
-   * @param {Object} params.path Path to save
-   * @param {Object} params.content Content
+   * @param {String} params.path Path to save
+   * @param {String} params.content Content
    */
   savePageToStorage(params) {
     const { path, content } = params;
@@ -163,6 +215,7 @@ module.exports = class PageStorage {
    * @param {String} dir
    */
   initLocalData(dir) {
+    console.log('init local data');
     fs.readdirSync(dir).forEach((item) => {
       if (fs.lstatSync(`${dir}/${item}`, { encoding: 'utf8' }).isFile()) {
         this.localData.push({
