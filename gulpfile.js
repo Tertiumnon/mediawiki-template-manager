@@ -13,8 +13,8 @@ const summary = process.argv.length > 4 && process.argv[4] ? process.argv[4] : '
 
 // Stream files
 gulp.task('stream', () => watch([
-  `${settings[server].articles_path}/**/**/**`,
-  `!${settings[server].articles_path}/.git/`,
+  `${settings[server].pagesPath}/**/**/**`,
+  `!${settings[server].pagesPath}/.git/`,
 ], { ignoreInitial: true, events: ['change'], verbose: true }, (file) => {
 
   // Prepare
@@ -24,11 +24,11 @@ gulp.task('stream', () => watch([
 
   // Make changes
   const bot = new MWBot({
-    apiUrl: settings[server].server_api,
+    apiUrl: settings[server].host,
   });
   bot.login({
-    username: settings[server].bot_user,
-    password: settings[server].bot_password,
+    username: settings[server].userName,
+    password: settings[server].userPassword,
   }).then(() => bot.getEditToken())
     .then(() => bot.update(p.name, p.text, summary))
     .then((response) => {

@@ -5,8 +5,8 @@ const settings = require('../../settings');
 
 // Получаем аргументы
 const server = process.argv.length > 2 && process.argv[2] ? process.argv[2].slice(2) : 'default';
-const pagesStorageFile = path.join(__dirname, `../../${settings[server].articles_path}/page-storage.txt`);
-const pagesPath = path.join(__dirname, `../../${settings[server].articles_path}`);
+const pagesStorageFile = path.join(__dirname, `../../${settings[server].pagesPath}/page-storage.txt`);
+const pagesPath = path.join(__dirname, `../../${settings[server].pagesPath}`);
 
 console.log('Pages path:', pagesPath);
 

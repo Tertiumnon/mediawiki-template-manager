@@ -1,20 +1,20 @@
 module.exports = {
 
   default: {
-    server_api: 'http://DEFAULT_SERVER/api.php',
-    articles_path: '../PATH_TO_PAGES_DIR/',
+    host: 'http://DEFAULT_SERVER/api.php',
+    pagesPath: '../PATH_TO_PAGES_DIR/',
     articles_del_list_file_path: '../PATH_TO_PAGES_DIR/.articles_lists/articles_del_list.txt',
     articles_upd_list_file_path: '../PATH_TO_PAGES_DIR/.articles_lists/articles_upd_list.txt',
-    bot_user: 'BOT_NAME',
-    bot_password: 'BOT_PASSWORD',
+    userName: 'BOT_NAME',
+    userPassword: 'userPassword',
   },
   prod: {
-    server_api: 'https://PROD_SERVER/api.php',
-    articles_path: '../PATH_TO_PAGES_DIR/',
+    host: 'https://PROD_SERVER/api.php',
+    pagesPath: '../PATH_TO_PAGES_DIR/',
     articles_del_list_file_path: '../PATH_TO_PAGES_DIR/.articles_lists/articles_del_list.txt',
     articles_upd_list_file_path: '../PATH_TO_PAGES_DIR/.articles_lists/articles_upd_list.txt',
-    bot_user: 'BOT_NAME',
-    bot_password: 'BOT_PASSWORD',
+    userName: 'BOT_NAME',
+    userPassword: 'userPassword',
   },
 
 };

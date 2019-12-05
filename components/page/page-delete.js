@@ -23,9 +23,9 @@ fs.readFile(path.join(__dirname, settings[server].articles_del_list_file_path), 
     const bot = new MWBot();
 
     bot.loginGetEditToken({
-      apiUrl: settings[server].server_api,
-      username: settings[server].bot_user,
-      password: settings[server].bot_password,
+      apiUrl: settings[server].host,
+      username: settings[server].userName,
+      password: settings[server].userPassword,
     }).then(() => bot.batch(batchJobs, summary)).catch((err) => {
       console.log(err);
     });

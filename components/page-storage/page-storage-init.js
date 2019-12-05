@@ -8,22 +8,19 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; // Disable SSL alerts
 
 // Arguments
 const server = process.argv.length > 2 && process.argv[2] ? process.argv[2].slice(2) : 'default';
-const dataPath = path.join(__dirname, `../../${settings[server].articles_path}`);
+const dataPath = path.join(__dirname, `../../${settings[server].pagesPath}`);
 
-// Create storage instance
-const pageStorage = new PageStorage({
-  dataPath,
-  apiURL: `${settings[server].server_api}`,
-  botData: {
-    user: `${settings[server].bot_user}`,
-    password: `${settings[server].bot_password}`,
-  },
-});
+const main = async () => {
+  const pageStorage = new PageStorage({
+    dataPath,
+    apiURL: `${settings[server].host}`,
+    botData: {
+      user: `${settings[server].userName}`,
+      password: `${settings[server].userPassword}`,
+    },
+  });
+  await pageStorage.createConnection();
+  await pageStorage.downloadAll();
+};
 
-// Do some magic
-const ps = pageStorage.init();
-ps.then(() => {
-  console.log('inited');
-}).catch((err) => {
-  console.log(err);
-});
+main();

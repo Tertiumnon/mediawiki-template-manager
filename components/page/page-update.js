@@ -19,19 +19,19 @@ const batchJobs = {
 for (let i = 0; i < filesList.length; i++) {
   if (filesList[i]) {
     const x = Page.getPagenameByFilepath(filesList[i]);
-    const y = Page.getFileContent(`${settings[server].articles_path}/${filesList[i]}`);
+    const y = Page.getFileContent(`${settings[server].pagesPath}/${filesList[i]}`);
     batchJobs.edit[x] = y;
   }
 }
 
 // Обновляем страницы
 const bot = new MWBot({
-  apiUrl: settings[server].server_api,
+  apiUrl: settings[server].host,
 });
 bot.loginGetEditToken({
-  apiUrl: settings[server].server_api,
-  username: settings[server].bot_user,
-  password: settings[server].bot_password,
+  apiUrl: settings[server].host,
+  username: settings[server].userName,
+  password: settings[server].userPassword,
 }).then(() => bot.batch(batchJobs, summary))
   .catch((err) => {
     console.log(err);
