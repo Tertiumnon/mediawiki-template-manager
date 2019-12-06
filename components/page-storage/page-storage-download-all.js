@@ -8,6 +8,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; // Disable SSL alerts
 
 // Arguments
 const server = process.argv.length > 2 && process.argv[2] ? process.argv[2].slice(2) : 'default';
+const argDeleteNotExistLSP = process.argv.length > 2 && process.argv[3] === '--rm-local';
 const dataPath = path.join(__dirname, `../../${settings[server].pagesPath}`);
 
 const main = async () => {
@@ -22,6 +23,9 @@ const main = async () => {
   try {
     await pageStorage.getMWEditToken();
     await pageStorage.downloadAll();
+    if (argDeleteNotExistLSP) {
+      pageStorage.deleteNotExistLSPages();
+    }
   } catch (error) {
     console.log(error);
   }

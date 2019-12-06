@@ -5,8 +5,8 @@ const settings = require('../../settings');
 
 // Получаем аргументы
 const server = process.argv.length > 2 && process.argv[2] ? process.argv[2].slice(2) : 'default';
-const pagesStorageFile = path.join(__dirname, `../../${settings[server].pagesPath}/page-storage.txt`);
-const pagesPath = path.join(__dirname, `../../${settings[server].pagesPath}`);
+const pagesStorageFile = path.join(__dirname, `../../${settings[server].pageStorage}`);
+const pagesPath = path.join(__dirname, `../../${settings[server].pagesPath}/`);
 
 console.log('Pages path:', pagesPath);
 
@@ -16,7 +16,7 @@ const ignorePaths = ['.git', 'node_modules'];
 const getPath = (dir) => {
   fs.readdirSync(dir).forEach((item) => {
     if (fs.lstatSync(dir + item).isFile()) {
-      pagePaths.push(dir + item);
+      pagePaths.push(item);
     } else if (ignorePaths.indexOf(item) === -1) {
       getPath(`${dir + item}/`);
     }
