@@ -1,17 +1,17 @@
+/* eslint-disable no-console */
 const path = require('path');
 
-const PageStorage = require('../page-storage/page-storage');
+const PageStorage = require('./page-storage');
 const settings = require('../../settings');
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; // Disable SSL alerts
 
 // Arguments
 const server = process.argv.length > 2 && process.argv[2] ? process.argv[2].slice(2) : 'default';
-const pagename = process.argv.length > 3 && process.argv[3] ? process.argv[3] : '';
-if (!pagename) throw new Error('No pagename');
+const argDeleteNotExistLSP = process.argv.length > 2 && process.argv[3] === '--rm-local';
+const dataPath = path.join(__dirname, `../../${settings[server].pagesPath}`);
 
 const main = async () => {
-  const dataPath = path.join(__dirname, `../../${settings[server].pagesPath}`);
   const pageStorage = new PageStorage({
     dataPath,
     apiURL: `${settings[server].host}`,
@@ -21,8 +21,11 @@ const main = async () => {
     },
   });
   try {
-    await pageStorage.getEditToken();
-    await pageStorage.download([pagename]);
+    await pageStorage.getMWEditToken();
+    await pageStorage.downloadAll();
+    if (argDeleteNotExistLSP) {
+      pageStorage.deleteNotExistLSPages();
+    }
   } catch (error) {
     console.log(error);
   }

@@ -1,20 +1,29 @@
+const initConfig = {
+  userName: 'USER_NAME',
+  userPassword: 'USER_PASSWORD',
+  pagesPath: './data/pages',
+  pagesToUpdate: './data/pages-to-edit/update.txt',
+  pagesToDelete: './data/pages-to-edit/delete.txt',
+  pageStorage: './data/pages-to-edit/storage.txt',
+};
+
 module.exports = {
 
   default: {
-    server_api: 'http://DEFAULT_SERVER/api.php',
-    articles_path: '../PATH_TO_PAGES_DIR/',
-    articles_del_list_file_path: '../PATH_TO_PAGES_DIR/.articles_lists/articles_del_list.txt',
-    articles_upd_list_file_path: '../PATH_TO_PAGES_DIR/.articles_lists/articles_upd_list.txt',
-    bot_user: 'BOT_NAME',
-    bot_password: 'BOT_PASSWORD',
+    host: 'https://DEFAULT-SITE/api.php',
+    ...initConfig,
+  },
+  dev: {
+    host: 'https://DEV-SITE/api.php',
+    ...initConfig,
+  },
+  preprod: {
+    host: 'https://PREPROD-SITE/api.php',
+    ...initConfig,
   },
   prod: {
-    server_api: 'https://PROD_SERVER/api.php',
-    articles_path: '../PATH_TO_PAGES_DIR/',
-    articles_del_list_file_path: '../PATH_TO_PAGES_DIR/.articles_lists/articles_del_list.txt',
-    articles_upd_list_file_path: '../PATH_TO_PAGES_DIR/.articles_lists/articles_upd_list.txt',
-    bot_user: 'BOT_NAME',
-    bot_password: 'BOT_PASSWORD',
+    host: 'https://PROD-SITE/api.php',
+    ...initConfig,
   },
 
 };

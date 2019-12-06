@@ -1,21 +1,36 @@
+const fs = require('fs');
 const path = require('path');
 
-const PageStorage = require('../page-storage/page-storage');
 const settings = require('../../settings');
-
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; // Disable SSL alerts
 
 // Получаем аргументы
 const server = process.argv.length > 2 && process.argv[2] ? process.argv[2].slice(2) : 'default';
-const dataPath = path.join(__dirname, `../../${settings[server].articles_path}`);
+const pagesStorageFile = path.join(__dirname, `../../${settings[server].pageStorage}`);
+const pagesPath = path.join(__dirname, `../../${settings[server].pagesPath}/`);
 
-const pageStorage = new PageStorage({
-  dataPath,
-  apiURL: `${settings[server].server_api}`,
-  botData: {
-    user: `${settings[server].bot_user}`,
-    password: `${settings[server].bot_password}`,
-  },
+console.log('Pages path:', pagesPath);
+
+const pagePaths = [];
+const ignorePaths = ['.git', 'node_modules'];
+
+const getPath = (dir) => {
+  fs.readdirSync(dir).forEach((item) => {
+    if (fs.lstatSync(dir + item).isFile()) {
+      pagePaths.push(item);
+    } else if (ignorePaths.indexOf(item) === -1) {
+      getPath(`${dir + item}/`);
+    }
+  });
+};
+
+getPath(pagesPath);
+
+let pagePathsStr = '';
+
+pagePaths.forEach((item) => {
+  pagePathsStr += `${item}\n`;
 });
-pageStorage.init();
-pageStorage.download(pageStorage.getPageList());
+
+fs.writeFileSync(pagesStorageFile, pagePathsStr);
+
+console.log('Page paths were saved to:', pagesStorageFile);
