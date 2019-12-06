@@ -36,116 +36,122 @@ module.exports = class PageStorage {
   async downloadAll() {
     console.log('init data');
     const { dataPath } = this;
-    this.initLocalData(dataPath);
-    await this.createConnection();
-    await this.getAllMediawikis();
-    await this.getAllTemplates();
-    await this.getAllHelps();
-    await this.getAllCategories();
-    await this.getAllProperties();
-    await this.getAllForms();
-    await this.getAllConcepts();
+    this.initLS(dataPath);
+    try {
+      await this.getMWEditToken();
+      await this.getAllMediawikis();
+      await this.getAllTemplates();
+      await this.getAllHelps();
+      await this.getAllCategories();
+      await this.getAllProperties();
+      await this.getAllForms();
+      await this.getAllConcepts();
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   /**
-   * Get all all pages from namespace MediaWiki
+   * Get all MediaWiki pages
    * @returns {Promise}
    */
   getAllMediawikis() {
-    console.log('get all all MediaWiki...');
-    return this.getAllPages({ ns: 8 });
+    console.log('Get all MediaWiki pages...');
+    return this.getRSPagesByNS({ ns: 8 });
   }
 
   /**
-   * Get all all pages from namespace Template
+   * Get all Template pages
    * @returns {Promise}
    */
   getAllTemplates() {
-    console.log('get all Template...');
-    return this.getAllPages({ ns: 10 });
+    console.log('Get all Template pages...');
+    return this.getRSPagesByNS({ ns: 10 });
   }
 
   /**
-   * Get all all pages from namespace Help
+   * Get all Help pages
    * @returns {Promise}
    */
   getAllHelps() {
-    console.log('get all Help...');
-    return this.getAllPages({ ns: 12 });
+    console.log('Get all Help pages...');
+    return this.getRSPagesByNS({ ns: 12 });
   }
 
   /**
-   * Get all all pages from namespace Category
+   * Get all Category pages
    * @returns {Promise}
    */
   getAllCategories() {
-    console.log('get all Category...');
-    return this.getAllPages({ ns: 14 });
+    console.log('Get all Category pages...');
+    return this.getRSPagesByNS({ ns: 14 });
   }
 
   /**
-   * Get all all pages from namespace Property
+   * Get all Property pages
    * @returns {Promise}
    */
   getAllProperties() {
-    console.log('get all Property...');
-    return this.getAllPages({ ns: 102 });
+    console.log('Get all Property pages...');
+    return this.getRSPagesByNS({ ns: 102 });
   }
 
   /**
-   * Get all all pages from namespace Form
+   * Get all Form pages
    * @returns {Promise}
    */
   getAllForms() {
-    console.log('get all Form...');
-    return this.getAllPages({ ns: 106 });
+    console.log('Get all Form pages...');
+    return this.getRSPagesByNS({ ns: 106 });
   }
 
   /**
-   * Get all all pages from namespace Concept
+   * Get all Concept pages
    * @returns {Promise}
    */
   getAllConcepts() {
-    console.log('get all Concept...');
-    return this.getAllPages({ ns: 108 });
+    console.log('Get all Concept pages...');
+    return this.getRSPagesByNS({ ns: 108 });
   }
 
   /**
-   * Get all pages
+   * Download pages from Remote Storage by Namespace
    * @param {Object} params
    * @param {String} params.ns Неймспейс
    * @returns {Promise}
    */
-  async getAllPages(params) {
-    await this.bot.loginGetEditToken({
-      apiUrl: this.apiURL,
-      username: this.botData.user,
-      password: this.botData.password,
-    });
-    const response = await this.bot.request({
-      action: 'query',
-      list: 'allpages',
-      apnamespace: params.ns,
-      aplimit: '5000',
-    });
-    if (response.continue) {
-      throw new Error('Parameter "continue" exists.');
-    }
-    if (
-      response.query
-      && response.query.allpages
-      && response.query.allpages.length > 0
-    ) {
-      const data = response.query.allpages.filter(
-        r => r.title !== '' && r.title.search('/') === -1,
-      );
-      await this.download(data.map(p => p.title));
-      this.data = [...this.data, ...data];
+  async getRSPagesByNS(params) {
+    try {
+      const response = await this.bot.request({
+        action: 'query',
+        list: 'allpages',
+        apnamespace: params.ns,
+        aplimit: '5000',
+      });
+      if (response.continue) {
+        throw new Error('Parameter "continue" exists.');
+      }
+      if (
+        response.query
+        && response.query.allpages
+        && response.query.allpages.length > 0
+      ) {
+        const data = response.query.allpages.filter(
+          r => r.title !== '' && r.title.search('/') === -1,
+        );
+        await this.downloadPages(data.map(p => p.title));
+        this.data = [...this.data, ...data];
+      }
+    } catch (error) {
+      console.log(error);
     }
   }
 
-  removeNotExistLocalPages() {
-    console.log('remove not existing local pages');
+  /**
+   * Delete not existing Local Storage pages
+   */
+  deleteNotExistLSPages() {
+    console.log('Delete not existing Local Storage pages');
     const pagenames = [
       this.localData.map(o => o.title),
       this.data.map(o => o.title),
@@ -162,30 +168,41 @@ module.exports = class PageStorage {
   }
 
   /**
-   * Get pagelist
+   * Get PageList
    * @returns {String[]}
    */
   getPageList() {
     return this.data.map(p => p.title);
   }
 
-  savePagesToStorage(response) {
-    console.log('save pages to storage...');
-    const ids = Object.keys(response.query.pages);
-    ids.forEach((id) => {
-      const pagename = response.query.pages[id].title;
-      const content = response.query.pages[id].revisions
-        ? response.query.pages[id].revisions[0]['*']
-        : '';
-      if (content === undefined) {
-        console.log(`There's no content for: ${pagename}`);
-      }
-      const path = this.getPathByName(pagename);
-      this.savePageToStorage({ pagename, path, content });
-    });
+  /**
+   * Save pages to Local Storage
+   * @param {Object} response
+   */
+  savePagesToLS(response) {
+    console.log('Save pages to Local Storage...');
+    if (response.query && response.query.pages) {
+      const ids = Object.keys(response.query.pages);
+      ids.forEach((id) => {
+        const pagename = response.query.pages[id].title;
+        const content = response.query.pages[id].revisions
+          ? response.query.pages[id].revisions[0]['*']
+          : '';
+        if (!content) {
+          console.log(`No content for: ${pagename}`);
+        } else {
+          const path = this.getPathByName(pagename);
+          // console.log(path);
+          this.savePageToLS({ pagename, path, content });
+        }
+      });
+    }
   }
 
-  async createConnection() {
+  /**
+   * Get MediaWiki Edit Token
+   */
+  async getMWEditToken() {
     await this.bot.loginGetEditToken({
       apiUrl: this.apiURL,
       username: this.botData.user,
@@ -194,13 +211,30 @@ module.exports = class PageStorage {
   }
 
   /**
-   * Download page or pages
+   * Download page or pages by pagename
    * @param {String[]} pagenames
    */
-  async download(pagenames) {
-    console.log('download...');
-    const read = await this.bot.read(pagenames.join('|'), { timeout: 8000 });
-    this.savePagesToStorage(read);
+  async downloadPages(pagenames) {
+    console.log('Download pages...');
+    let read = [];
+    const l = pagenames.length;
+    if (l > 500) {
+      const parts = l / 500;
+      const promises = [];
+      for (let i = 0; i < Math.ceil(parts); i += 1) {
+        const j = i > 0 ? i * 500 : i;
+        const pns = pagenames.slice(j, (j + 500));
+        promises.push(this.bot.read(pns.join('|'), { timeout: 8000 }));
+      }
+      const readAll = await Promise.all(promises);
+      readAll.forEach((item) => {
+        read = { ...read, ...item };
+        this.savePagesToLS(read);
+      });
+    } else {
+      read = { ...read, ...await this.bot.read(pagenames.join('|'), { timeout: 8000 }) };
+      this.savePagesToLS(read);
+    }
   }
 
   /**
@@ -209,7 +243,7 @@ module.exports = class PageStorage {
    * @param {String} params.path Path to save
    * @param {String} params.content Content
    */
-  savePageToStorage(params) {
+  savePageToLS(params) {
     const { path, content } = params;
     fs.writeFile(
       `${this.dataPath}/${path}`,
@@ -223,7 +257,7 @@ module.exports = class PageStorage {
   }
 
   /**
-   * Get path by page name
+   * Get path by pagename
    * @param {String} pagename
    * @returns
    */
@@ -235,11 +269,11 @@ module.exports = class PageStorage {
   }
 
   /**
-   * Get all pages saved locally
+   * Init Local Storage
    * @param {String} dir
    */
-  initLocalData(dir) {
-    console.log('init local data');
+  initLS(dir) {
+    console.log('init local data...');
     fs.readdirSync(dir).forEach((item) => {
       if (fs.lstatSync(`${dir}/${item}`, { encoding: 'utf8' }).isFile()) {
         this.localData.push({
@@ -247,7 +281,7 @@ module.exports = class PageStorage {
           path: `${dir}/${item}`.replace(`${this.dataPath}/`, ''),
         });
       } else if (this.ignoredPaths.indexOf(item) === -1) {
-        this.initLocalData(`${dir}/${item}`);
+        this.initLS(`${dir}/${item}`);
       }
     });
   }

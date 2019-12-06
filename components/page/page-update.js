@@ -6,7 +6,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; // Disable SSL alerts
 
 // Получаем аргументы
 const server = process.argv.length > 2 && process.argv[2] ? process.argv[2].slice(2) : 'default';
-const summary = process.argv.length > 3 && process.argv[3] ? process.argv[3] : 'Обновление';
+const summary = process.argv.length > 3 && process.argv[3] ? process.argv[3] : 'Update';
 
 // Получаем список страниц для обновления
 const filesListData = Page.getFileContent(settings[server].articles_upd_list_file_path);
@@ -16,7 +16,7 @@ const filesList = filesListData.split('\n');
 const batchJobs = {
   edit: {},
 };
-for (let i = 0; i < filesList.length; i++) {
+for (let i = 0; i < filesList.length; i += 1) {
   if (filesList[i]) {
     const x = Page.getPagenameByFilepath(filesList[i]);
     const y = Page.getFileContent(`${settings[server].pagesPath}/${filesList[i]}`);

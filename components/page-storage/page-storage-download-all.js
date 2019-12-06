@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 const path = require('path');
 
-const PageStorage = require('../page-storage/page-storage');
+const PageStorage = require('./page-storage');
 const settings = require('../../settings');
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; // Disable SSL alerts
@@ -19,8 +19,12 @@ const main = async () => {
       password: `${settings[server].userPassword}`,
     },
   });
-  await pageStorage.createConnection();
-  await pageStorage.downloadAll();
+  try {
+    await pageStorage.getMWEditToken();
+    await pageStorage.downloadAll();
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 main();

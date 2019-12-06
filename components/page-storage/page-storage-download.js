@@ -20,8 +20,12 @@ const main = async () => {
       password: `${settings[server].userPassword}`,
     },
   });
-  await pageStorage.createConnection();
-  await pageStorage.download([pagename]);
+  try {
+    await pageStorage.getEditToken();
+    await pageStorage.download([pagename]);
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 main();

@@ -30,6 +30,7 @@
     "init": "node components/page-storage/page-storage-init.js",
     "read": "node components/page-storage/page-storage-read.js",
     "download": "node components/page-storage/page-storage-download.js",
+    "download:all": "node components/page-storage/page-storage-download-all.js",
     "upload": "node components/page-storage/page-storage-upload.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
