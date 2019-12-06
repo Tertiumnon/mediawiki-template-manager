@@ -1,6 +1,6 @@
 {
   "name": "mw-deploy",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "",
   "main": "index.js",
   "dependencies": {
